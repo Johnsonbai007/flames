@@ -1,24 +1,10 @@
 import React from 'react';
-import { Heart, Volume2, VolumeX, History, Database, Sparkles, HelpCircle } from 'lucide-react';
-import { isSupabaseConfigured } from '../lib/supabase';
-import { useAudio } from '../context/AudioContext';
+import { Heart, Sparkles } from 'lucide-react';
 
-interface NavbarProps {
-  onOpenHistory: () => void;
-  recentCount: number;
-  onOpenSupabaseModal: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({
-  onOpenHistory,
-  recentCount,
-  onOpenSupabaseModal,
-}) => {
-  const { soundEnabled, toggleSound, playPop } = useAudio();
-
+export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-30 w-full backdrop-blur-xl bg-slate-950/40 border-b border-pink-500/15 transition-all">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
         {/* Brand / Logo */}
         <div className="flex items-center gap-3 select-none">
           <div className="relative group flex items-center justify-center">
@@ -43,62 +29,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right side controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Supabase status badge */}
-          <button
-            onClick={() => {
-              playPop();
-              onOpenSupabaseModal();
-            }}
-            title={isSupabaseConfigured ? 'Connected to Supabase' : 'Running in Local Mode (Click for Supabase Setup)'}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-              isSupabaseConfigured
-                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-                : 'bg-purple-500/10 text-purple-200/80 border-purple-500/25 hover:bg-purple-500/20'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">
-              {isSupabaseConfigured ? 'Supabase Sync' : 'Local Storage'}
-            </span>
-            <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`} />
-          </button>
-
-          {/* Sound toggle button */}
-          <button
-            onClick={() => {
-              toggleSound();
-              playPop();
-            }}
-            className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-pink-400/50"
-            aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
-            title={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
-          >
-            {soundEnabled ? (
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
-            ) : (
-              <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
-            )}
-          </button>
-
-          {/* History button */}
-          <button
-            onClick={() => {
-              playPop();
-              onOpenHistory();
-            }}
-            className="relative flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/30 text-pink-200 text-xs sm:text-sm font-medium transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400/50"
-            aria-label="View recent calculations"
-          >
-            <History className="w-4 h-4 text-pink-400" />
-            <span className="hidden sm:inline">Recent</span>
-            {recentCount > 0 && (
-              <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-pink-500 text-white text-[11px] font-bold">
-                {recentCount}
-              </span>
-            )}
-          </button>
+        {/* Right side decorative romantic pill */}
+        <div className="flex items-center">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-white/5 text-pink-200/80 border-pink-500/20 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+            <span className="hidden sm:inline">Cosmic Compatibility</span>
+          </div>
         </div>
       </div>
     </header>

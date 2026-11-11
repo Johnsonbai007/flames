@@ -3,7 +3,6 @@ import { FlamesResult } from '../utils/flamesAlgorithm';
 import { FLAMES_DETAILS } from '../utils/flamesData';
 import { X, Copy, Check, ExternalLink, Heart, MessageCircle } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
-import { useAudio } from '../context/AudioContext';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -13,7 +12,6 @@ interface ShareModalProps {
 
 export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, result }) => {
   const { showToast } = useToast();
-  const { playPop } = useAudio();
 
   if (!isOpen || !result) return null;
 
@@ -22,7 +20,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, result 
   const shareText = `❤️ FLAMES Love Result: ${result.yourName} & ${result.partnerName} got ${detail.name} ${detail.emoji}! Compatibility: ${detail.compatibilityScore}%. Test yours at ${url}`;
 
   const handleCopyLink = async () => {
-    playPop();
     try {
       await navigator.clipboard.writeText(url);
       showToast('Link copied to clipboard! 🔗', 'love');
@@ -32,7 +29,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, result 
   };
 
   const handleCopyMessage = async () => {
-    playPop();
     try {
       await navigator.clipboard.writeText(shareText);
       showToast('Full romantic message copied! 💌', 'love');
@@ -42,13 +38,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, result 
   };
 
   const shareWhatsApp = () => {
-    playPop();
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
   const shareTwitter = () => {
-    playPop();
     const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
     window.open(twUrl, '_blank', 'noopener,noreferrer');
   };
@@ -63,10 +57,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, result 
       <div className="relative w-full max-w-md glass-card rounded-3xl p-6 sm:p-7 border border-pink-400/30 shadow-2xl animate-scaleUp">
         {/* Close Button */}
         <button
-          onClick={() => {
-            playPop();
-            onClose();
-          }}
+          onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
           aria-label="Close share dialog"
         >

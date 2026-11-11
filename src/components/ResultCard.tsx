@@ -12,9 +12,7 @@ import {
   Quote,
   Check,
   Compass,
-  Database,
 } from 'lucide-react';
-import { useAudio } from '../context/AudioContext';
 import { useToast } from '../context/ToastContext';
 import { SaveResultResponse } from '../lib/supabase';
 
@@ -32,14 +30,10 @@ export const ResultCard: React.FC<ResultCardProps> = ({
   saveStatus,
 }) => {
   const detail = FLAMES_DETAILS[result.resultKey];
-  const { playSparkle, playPop } = useAudio();
   const { showToast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Play celestial sparkle sound
-    playSparkle();
-
     // Trigger romantic heart confetti burst
     try {
       // Fire left & right cannons with hearts
@@ -81,10 +75,9 @@ export const ResultCard: React.FC<ResultCardProps> = ({
     if (cardRef.current) {
       cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [result, playSparkle]);
+  }, [result]);
 
   const handleCopy = async () => {
-    playPop();
     const formattedText = `❤️ FLAMES Love Destiny ❤️
 ✨ ${result.yourName} & ${result.partnerName}
 🔥 Result: ${detail.name} ${detail.emoji} (${detail.badge})
@@ -107,7 +100,6 @@ Calculate your FLAMES connection: ${window.location.origin}`;
   };
 
   const handleShare = async () => {
-    playPop();
     const shareData = {
       title: `${result.yourName} & ${result.partnerName} – FLAMES Love Connection ❤️`,
       text: `We calculated our FLAMES connection and got ${detail.name} ${detail.emoji}! See what destiny says for you!`,
@@ -143,8 +135,8 @@ Calculate your FLAMES connection: ${window.location.origin}`;
         <div
           className={`relative rounded-3xl p-6 sm:p-10 border ${detail.theme.border} bg-gradient-to-b ${detail.theme.cardBg} backdrop-blur-2xl shadow-2xl overflow-hidden`}
         >
-          {/* Top Bar: Database save indicator & Result Badge */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
+          {/* Top Bar: Result Badge */}
+          <div className="flex items-center justify-center sm:justify-start mb-6 sm:mb-8">
             <div
               className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs sm:text-sm font-semibold ${detail.theme.badgeBg} ${detail.theme.badgeText}`}
             >
@@ -154,27 +146,6 @@ Calculate your FLAMES connection: ${window.location.origin}`;
               </span>
               <span>{detail.emoji}</span>
             </div>
-
-            {/* Supabase status badge for this specific calculation */}
-            {saveStatus && (
-              <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium border ${
-                  saveStatus.savedTo === 'supabase'
-                    ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                    : 'bg-white/5 text-pink-200/70 border-white/10'
-                }`}
-                title={
-                  saveStatus.savedTo === 'supabase'
-                    ? 'Saved securely to Supabase'
-                    : 'Saved to local browser history (Supabase unconfigured or offline)'
-                }
-              >
-                <Database className="w-3 h-3" />
-                <span>
-                  {saveStatus.savedTo === 'supabase' ? 'Synced to Cloud' : 'Saved Locally'}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Couple Header */}
@@ -285,10 +256,7 @@ Calculate your FLAMES connection: ${window.location.origin}`;
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-white/10">
             {/* Try Another Couple */}
             <button
-              onClick={() => {
-                playPop();
-                onReset();
-              }}
+              onClick={onReset}
               className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-pink-400"
             >
               <RotateCcw className="w-4 h-4 text-pink-400" />

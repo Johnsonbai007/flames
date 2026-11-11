@@ -1,8 +1,16 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { SavedFlamesItem, getLocalFlames, saveLocalFlames } from '../utils/storage';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export interface SavedFlamesItem {
+  id: string;
+  your_name: string;
+  partner_name: string;
+  flames_result: string;
+  created_at: string;
+  source?: 'supabase' | 'session';
+}
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
@@ -14,7 +22,7 @@ export const isSupabaseConfigured = Boolean(
   !supabaseUrl.includes('your-supabase-url')
 );
 
-// Initialize official client only if credentials look valid to avoid initialization crash
+// Initialize official client only if credentials look valid
 export const supabase: SupabaseClient | null = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -26,40 +34,40 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
 
 export interface SaveResultResponse {
   success: boolean;
-  savedTo: 'supabase' | 'local';
+  savedTo: 'supabase' | null;
   data: SavedFlamesItem;
   error?: string;
 }
 
 export interface FetchResultsResponse {
   success: boolean;
-  source: 'supabase' | 'local';
   data: SavedFlamesItem[];
   error?: string;
 }
 
 /**
- * Saves a FLAMES calculation to Supabase if configured.
- * Automatically mirrors to local storage so calculation history is always preserved.
+ * Saves a FLAMES calculation directly to Supabase if configured.
+ * Does not use localStorage.
  */
 export async function saveFlamesResult(
   yourName: string,
   partnerName: string,
   flamesResult: string
 ): Promise<SaveResultResponse> {
-  // Always save to local storage first as a guaranteed fallback
-  const localItem = saveLocalFlames({
-    your_name: yourName,
-    partner_name: partnerName,
-    flames_result: flamesResult,
-  });
+  const sessionItem: SavedFlamesItem = {
+    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'calc-' + Date.now(),
+    your_name: yourName.trim(),
+    partner_name: partnerName.trim(),
+    flames_result: flamesResult.trim(),
+    created_at: new Date().toISOString(),
+    source: 'session',
+  };
 
   if (!isSupabaseConfigured || !supabase) {
     return {
       success: true,
-      savedTo: 'local',
-      data: localItem,
-      error: 'Supabase credentials not configured. Saved to local storage.',
+      savedTo: null,
+      data: sessionItem,
     };
   }
 
@@ -80,8 +88,8 @@ export async function saveFlamesResult(
       console.warn('Supabase insert failed:', error.message);
       return {
         success: false,
-        savedTo: 'local',
-        data: localItem,
+        savedTo: null,
+        data: sessionItem,
         error: error.message,
       };
     }
@@ -104,25 +112,22 @@ export async function saveFlamesResult(
     console.warn('Supabase network error during insert:', err);
     return {
       success: false,
-      savedTo: 'local',
-      data: localItem,
+      savedTo: null,
+      data: sessionItem,
       error: err?.message || 'Network error communicating with Supabase',
     };
   }
 }
 
 /**
- * Fetches recent FLAMES calculations.
- * Queries Supabase if available; gracefully falls back to local storage.
+ * Fetches recent FLAMES calculations directly from Supabase if configured.
+ * Does not use localStorage.
  */
 export async function fetchRecentFlames(limit = 15): Promise<FetchResultsResponse> {
   if (!isSupabaseConfigured || !supabase) {
-    const local = getLocalFlames();
     return {
       success: true,
-      source: 'local',
-      data: local.slice(0, limit),
-      error: 'Supabase is not configured. Showing local history.',
+      data: [],
     };
   }
 
@@ -135,11 +140,9 @@ export async function fetchRecentFlames(limit = 15): Promise<FetchResultsRespons
 
     if (error) {
       console.warn('Supabase select error:', error.message);
-      const local = getLocalFlames();
       return {
         success: false,
-        source: 'local',
-        data: local.slice(0, limit),
+        data: [],
         error: error.message,
       };
     }
@@ -155,16 +158,13 @@ export async function fetchRecentFlames(limit = 15): Promise<FetchResultsRespons
 
     return {
       success: true,
-      source: 'supabase',
       data: formatted,
     };
   } catch (err: any) {
     console.warn('Supabase fetch network error:', err);
-    const local = getLocalFlames();
     return {
       success: false,
-      source: 'local',
-      data: local.slice(0, limit),
+      data: [],
       error: err?.message || 'Network error communicating with Supabase',
     };
   }

@@ -31,18 +31,14 @@ Calculate your true relationship destiny based on the authentic, traditional pap
   - **M – Marriage** 💍 (*Eternal gold and champagne, sacred lifelong union*)
   - **E – Enemies** ⚡ (*Electric violet-rose tension, spicy frenemies-to-lovers*)
   - **S – Siblings** 🧸 (*Sunny teal-cyan camaraderie, protective family kinship*)
-- **Sound Effects (Web Audio API)**:
-  - Gentle romantic synthesized chimes and celestial sparkle tones.
-  - No external MP3 dependencies—100% reliable and instantaneous.
-  - One-click mute/unmute control in navigation.
 - **Sharing & Exporting**:
   - Native Web Share API integration (mobile & supported browsers).
   - Elegant fallback modal with direct WhatsApp and X (Twitter) sharing.
   - One-click formatted clipboard copy with love poem & stats.
-- **Supabase Integration & Offline Resilience**:
+- **Supabase Cloud Integration**:
   - Connects to Supabase with official `@supabase/supabase-js`.
-  - Transparent dual-storage model: Saves to Supabase when configured, and always keeps a local browser history backup.
-  - Works 100% seamlessly offline or without Supabase credentials.
+  - Saves calculations directly to the `flames_results` table in Supabase when configured.
+  - Works seamlessly in standalone mode without requiring a database.
   - Transparent status reporting: Never pretends database operations succeeded when they failed.
   - Built-in connection tester and diagnostic modal.
 
@@ -113,7 +109,7 @@ This will create:
   - `partner_name` (Text, NOT NULL)
   - `flames_result` (Text, NOT NULL)
   - `created_at` (Timestamp with time zone, default `now()`)
-- An index on `created_at DESC` for fast history retrieval.
+- An index on `created_at DESC` for fast retrieval.
 - Row Level Security (RLS) policies allowing public anonymous inserts and selects while protecting against unauthorized modifications.
 
 ### Step 3: Configure Environment Variables
@@ -131,10 +127,8 @@ This will create:
 5. Restart your Vite development server (`npm run dev`).
 
 ### Step 4: Verify the Connection
-- Click the **Database Status** button in the top navigation bar or footer.
+- Click the **Database Setup** button in the top navigation bar or footer.
 - Click **"Test Connection"** to verify that your Supabase database is reachable and accepting calculations.
-
-> **Note**: If you don't configure Supabase, the app will continue to run with full functionality using browser `localStorage`!
 
 ---
 
@@ -156,21 +150,18 @@ flames/
     │   ├── CalculationBreakdown.tsx # Traditional strikethrough & elimination visualizer
     │   ├── FlameLoader.tsx          # Multi-phase cosmic calculation suspense loader
     │   ├── HeroSection.tsx          # Main input cards, swap, validation, & couple chips
-    │   ├── Navbar.tsx               # Header, logo, sound toggle, & database status
-    │   ├── RecentCalculations.tsx   # History drawer with search & clear options
+    │   ├── Navbar.tsx               # Header, logo, & database status
     │   ├── ResultCard.tsx           # Romantic reveal card with outcome themes & stats
     │   ├── ShareModal.tsx           # Social share & message copy dialog
     │   └── SupabaseModal.tsx        # Database status diagnostic & setup helper
     ├── context/
-    │   ├── AudioContext.tsx         # Synthesized romantic audio with Web Audio API
     │   └── ToastContext.tsx         # Global romantic toast notification system
     ├── lib/
     │   └── supabase.ts              # Supabase client wrapper & safe query helpers
     ├── utils/
     │   ├── flamesAlgorithm.ts       # Authentic traditional FLAMES algorithm logic
     │   ├── flamesData.ts            # Detailed themes, quotes, stats & descriptions
-    │   ├── flames.test.ts           # Comprehensive automated unit test suite
-    │   └── storage.ts               # LocalStorage backup manager for history
+    │   └── flames.test.ts           # Comprehensive automated unit test suite
     ├── App.tsx                      # Main application orchestrator
     ├── index.css                    # Tailwind CSS v4 & custom glassmorphism styles
     ├── main.tsx                     # React root mount

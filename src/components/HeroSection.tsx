@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Heart, Sparkles, ArrowRightLeft, Flame, User, X, Wand2 } from 'lucide-react';
-import { useAudio } from '../context/AudioContext';
 
 interface HeroSectionProps {
   onCalculate: (name1: string, name2: string) => void;
@@ -19,17 +18,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onCalculate, isLoading
   const [yourName, setYourName] = useState('');
   const [partnerName, setPartnerName] = useState('');
   const [errors, setErrors] = useState<{ yourName?: string; partnerName?: string }>({});
-  const { playPop } = useAudio();
 
   const handleSwap = () => {
-    playPop();
     setYourName(partnerName);
     setPartnerName(yourName);
     setErrors({});
   };
 
   const handleSampleClick = (sample1: string, sample2: string) => {
-    playPop();
     setYourName(sample1);
     setPartnerName(sample2);
     setErrors({});
@@ -37,7 +33,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onCalculate, isLoading
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    playPop();
 
     const clean1 = yourName.trim();
     const clean2 = partnerName.trim();
